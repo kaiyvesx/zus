@@ -19,6 +19,38 @@ const API_BASE = getApiBase();
 
 // Helper function to handle API responses
 const handleResponse = async (response) => {
+  // Handle network errors
+  if (!response.ok) {
+    const contentType = response.headers.get('content-type');
+    let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+    
+    if (contentType && contentType.includes('application/json')) {
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorData.message || errorMessage;
+        
+        // Check for specific error messages
+        if (errorMessage.toLowerCase().includes('unauthenticated') || 
+            errorMessage.toLowerCase().includes('unauthorized')) {
+          if (response.status === 401 || response.status === 403) {
+            errorMessage = 'Authentication failed. Please check your bearer token or login again.';
+          }
+        }
+      } catch (e) {
+        // If JSON parsing fails, try to get text
+        const text = await response.text();
+        errorMessage = text || errorMessage;
+      }
+    } else {
+      const text = await response.text();
+      if (text) {
+        errorMessage = text.substring(0, 200);
+      }
+    }
+    
+    throw new Error(errorMessage);
+  }
+  
   const contentType = response.headers.get('content-type');
   
   if (!contentType || !contentType.includes('application/json')) {

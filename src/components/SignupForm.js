@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { getRandomFirstName, getRandomLastName, generateEmail, generateDOB, areNamesLoaded } from '../utils/generators';
+import { formatPhoneInput, getFullPhoneNumber } from '../utils/phoneFormatter';
 import CoffeeProgressBar from './CoffeeProgressBar';
 import './FormStyles.css';
 
@@ -49,10 +50,16 @@ const SignupForm = ({ bearerToken, onBearerTokenChange, onClose }) => {
       return;
     }
 
+    const fullPhoneNumber = getFullPhoneNumber(phone);
+    if (!fullPhoneNumber || fullPhoneNumber.length !== 12) {
+      setOtpStatus('Please enter a valid 10-digit phone number (e.g., 9308201445)');
+      return;
+    }
+
     setOtpStatus('Sending OTP code...');
 
     try {
-      const data = await api.requestOTP(phone, bearerToken);
+      const data = await api.requestOTP(fullPhoneNumber, bearerToken);
       if (data.success) {
         setOtpStatus('OTP code sent! Check your SMS.');
         setStep(2);
@@ -70,10 +77,16 @@ const SignupForm = ({ bearerToken, onBearerTokenChange, onClose }) => {
       return;
     }
 
+    const fullPhoneNumber = getFullPhoneNumber(phone);
+    if (!fullPhoneNumber || fullPhoneNumber.length !== 12) {
+      setVerifyStatus('Please enter a valid 10-digit phone number (e.g., 9308201445)');
+      return;
+    }
+
     setVerifyStatus('Verifying OTP...');
 
     try {
-      const data = await api.getBearerToken(phone, otp);
+      const data = await api.getBearerToken(fullPhoneNumber, otp);
       if (data.success && (data.bearer_token || data.new_user)) {
         if (data.bearer_token) {
           setSignupBearerToken(data.bearer_token);
@@ -93,6 +106,12 @@ const SignupForm = ({ bearerToken, onBearerTokenChange, onClose }) => {
   const registerAccount = async () => {
     if (!firstName || !lastName || !email || !dob || !phone) {
       setRegisterStatus('Please fill all required fields');
+      return;
+    }
+
+    const fullPhoneNumber = getFullPhoneNumber(phone);
+    if (!fullPhoneNumber || fullPhoneNumber.length !== 12) {
+      setRegisterStatus('Please enter a valid 10-digit phone number (e.g., 9308201445)');
       return;
     }
 
@@ -118,7 +137,7 @@ const SignupForm = ({ bearerToken, onBearerTokenChange, onClose }) => {
         lastName,
         email,
         dob,
-        phone,
+        phone: fullPhoneNumber,
         dobPrivate,
       });
 
@@ -165,13 +184,14 @@ const SignupForm = ({ bearerToken, onBearerTokenChange, onClose }) => {
       {step === 1 && (
         <div>
           <div style={{ marginBottom: '12px' }}>
-            <label className="form-label">Phone Number <small style={{ color: 'var(--zus-muted)', fontWeight: 'normal' }}>(without country code)</small></label>
+            <label className="form-label">Phone Number <small style={{ color: 'var(--zus-muted)', fontWeight: 'normal' }}>(10 digits only)</small></label>
             <input
               type="text"
               className="form-input"
               placeholder="e.g., 9308201445 (63 will be added automatically)"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => setPhone(formatPhoneInput(e.target.value))}
+              maxLength={10}
             />
           </div>
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>

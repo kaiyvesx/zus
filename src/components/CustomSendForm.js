@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import api from '../services/api';
 import { generateAll } from '../utils/generators';
+import { formatPhoneInput, getFullPhoneNumber } from '../utils/phoneFormatter';
 import CoffeeProgressBar from './CoffeeProgressBar';
 import './FormStyles.css';
 
@@ -34,6 +35,12 @@ const CustomSendForm = ({ bearerToken, onClose }) => {
 
     if (!recipientPhone.trim()) {
       setStatus('Please enter recipient phone number');
+      return;
+    }
+
+    const fullPhoneNumber = getFullPhoneNumber(recipientPhone);
+    if (!fullPhoneNumber || fullPhoneNumber.length !== 12) {
+      setStatus('Please enter a valid 10-digit phone number (e.g., 9308201445)');
       return;
     }
 
@@ -76,7 +83,7 @@ const CustomSendForm = ({ bearerToken, onClose }) => {
         sender_name: senderName.trim(),
         recipient_name: recipientName.trim(),
         message: message.trim() || "You're the light in the dark. You cheer me up when I'm down. Here are some drinks for you!",
-        recipient_phone_number: recipientPhone.trim(),
+        recipient_phone_number: fullPhoneNumber,
       });
 
       clearInterval(progressInterval);
@@ -220,9 +227,10 @@ const CustomSendForm = ({ bearerToken, onClose }) => {
         <input
           type="text"
           className="form-input"
-          placeholder="e.g., 639123456789"
+          placeholder="e.g., 9308201445 (63 will be added automatically)"
           value={recipientPhone}
-          onChange={(e) => setRecipientPhone(e.target.value)}
+          onChange={(e) => setRecipientPhone(formatPhoneInput(e.target.value))}
+          maxLength={10}
           disabled={isLoading}
         />
       </div>
@@ -239,6 +247,51 @@ const CustomSendForm = ({ bearerToken, onClose }) => {
           step="0.01"
           disabled={isLoading}
         />
+        <div style={{ 
+          display: 'flex', 
+          gap: '8px', 
+          marginTop: '8px', 
+          flexWrap: 'wrap' 
+        }}>
+          {[50, 100, 200, 250, 300].map((suggestedAmount) => (
+            <button
+              key={suggestedAmount}
+              type="button"
+              onClick={() => setAmount(suggestedAmount.toFixed(2))}
+              disabled={isLoading}
+              style={{
+                padding: '6px 14px',
+                fontSize: '13px',
+                fontWeight: 600,
+                background: amount === suggestedAmount.toFixed(2) 
+                  ? 'linear-gradient(135deg, var(--zus-navy) 0%, var(--zus-blue) 100%)'
+                  : 'var(--zus-cream)',
+                color: amount === suggestedAmount.toFixed(2) 
+                  ? 'var(--zus-white)' 
+                  : 'var(--zus-navy)',
+                border: `2px solid ${amount === suggestedAmount.toFixed(2) 
+                  ? 'var(--zus-navy)' 
+                  : 'var(--zus-navy)'}`,
+                borderRadius: '6px',
+                cursor: isLoading ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s ease',
+                opacity: isLoading ? 0.6 : 1,
+              }}
+              onMouseEnter={(e) => {
+                if (!isLoading && amount !== suggestedAmount.toFixed(2)) {
+                  e.target.style.background = 'rgba(26, 36, 86, 0.1)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isLoading && amount !== suggestedAmount.toFixed(2)) {
+                  e.target.style.background = 'var(--zus-cream)';
+                }
+              }}
+            >
+              ₱{suggestedAmount}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="full">

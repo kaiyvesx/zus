@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import api from '../services/api';
+import { formatPhoneInput, getFullPhoneNumber } from '../utils/phoneFormatter';
 import CoffeeProgressBar from './CoffeeProgressBar';
 import './FormStyles.css';
 
@@ -18,10 +19,16 @@ const LoginForm = ({ bearerToken, onBearerTokenChange, onClose }) => {
       return;
     }
 
+    const fullPhoneNumber = getFullPhoneNumber(phone);
+    if (!fullPhoneNumber || fullPhoneNumber.length !== 12) {
+      setOtpStatus('Please enter a valid 10-digit phone number (e.g., 9308201445)');
+      return;
+    }
+
     setOtpStatus('Sending OTP code...');
 
     try {
-      const data = await api.requestOTP(phone);
+      const data = await api.requestOTP(fullPhoneNumber);
       if (data.success) {
         setOtpStatus('OTP code sent! Check your SMS.');
         setStep(2);
@@ -36,6 +43,12 @@ const LoginForm = ({ bearerToken, onBearerTokenChange, onClose }) => {
   const getBearerToken = async () => {
     if (!phone || !otp) {
       setLoginStatus('Please enter phone and OTP code');
+      return;
+    }
+
+    const fullPhoneNumber = getFullPhoneNumber(phone);
+    if (!fullPhoneNumber || fullPhoneNumber.length !== 12) {
+      setLoginStatus('Please enter a valid 10-digit phone number (e.g., 9308201445)');
       return;
     }
 
@@ -55,7 +68,7 @@ const LoginForm = ({ bearerToken, onBearerTokenChange, onClose }) => {
     }, 200);
 
     try {
-      const data = await api.getBearerToken(phone, otp);
+      const data = await api.getBearerToken(fullPhoneNumber, otp);
       
       clearInterval(progressInterval);
       setProgress(100);
@@ -92,13 +105,14 @@ const LoginForm = ({ bearerToken, onBearerTokenChange, onClose }) => {
       {step === 1 && (
         <div>
           <div style={{ marginBottom: '12px' }}>
-            <label className="form-label">Phone Number <small style={{ color: 'var(--zus-muted)', fontWeight: 'normal' }}>(without country code)</small></label>
+            <label className="form-label">Phone Number <small style={{ color: 'var(--zus-muted)', fontWeight: 'normal' }}>(10 digits only)</small></label>
             <input
               type="text"
               className="form-input"
               placeholder="e.g., 9308201445 (63 will be added automatically)"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => setPhone(formatPhoneInput(e.target.value))}
+              maxLength={10}
             />
           </div>
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>

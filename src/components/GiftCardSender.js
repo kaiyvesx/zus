@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { generateAll } from '../utils/generators';
+import { formatPhoneInput, getFullPhoneNumber } from '../utils/phoneFormatter';
+import CoffeeProgressBar from './CoffeeProgressBar';
 import './GiftCardSender.css';
 
 const GiftCardSender = ({ bearerToken, onBearerTokenChange, activeForm, setActiveForm }) => {
@@ -10,31 +12,45 @@ const GiftCardSender = ({ bearerToken, onBearerTokenChange, activeForm, setActiv
   const [message, setMessage] = useState('');
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [isActivatingBalance, setIsActivatingBalance] = useState(false);
   const [activateBalanceStatus, setActivateBalanceStatus] = useState('');
   const [attemptedTokens, setAttemptedTokens] = useState(new Set()); // Track tokens we've already tried
   const [balance, setBalance] = useState(null); // Current balance
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
+  const [totalRedeemed, setTotalRedeemed] = useState(null); // Total redeemed gift cards count
+  const [totalRedeemedAmount, setTotalRedeemedAmount] = useState(null); // Total redeemed gift cards amount
 
   // Fetch balance function
   const fetchBalance = async () => {
     if (!bearerToken || bearerToken.length <= 20) {
       setBalance(null);
+      setTotalRedeemed(null);
+      setTotalRedeemedAmount(null);
       return;
     }
 
     setIsLoadingBalance(true);
     try {
-      const data = await api.getBalance(bearerToken);
-      if (data.success) {
+      const [balanceData, redeemedData] = await Promise.all([
+        api.getBalance(bearerToken),
+        api.getRedeemedGiftCards(bearerToken),
+      ]);
+      
+      if (balanceData.success) {
         setBalance({
-          balance: parseFloat(data.balance || 0),
-          promotional_balance: parseFloat(data.promotional_balance || 0),
-          total: parseFloat(data.total_balance || 0),
+          balance: parseFloat(balanceData.balance || 0),
+          promotional_balance: parseFloat(balanceData.promotional_balance || 0),
+          total: parseFloat(balanceData.total_balance || 0),
         });
       }
+      
+      if (redeemedData.success) {
+        setTotalRedeemed(redeemedData.total || 0);
+        setTotalRedeemedAmount(parseFloat(redeemedData.totalAmount || 0));
+      }
     } catch (err) {
-      console.error('Failed to fetch balance:', err);
+      console.error('Failed to fetch balance or redeemed cards:', err);
     } finally {
       setIsLoadingBalance(false);
     }
@@ -161,18 +177,54 @@ const GiftCardSender = ({ bearerToken, onBearerTokenChange, activeForm, setActiv
       return;
     }
 
+    const fullPhoneNumber = getFullPhoneNumber(recipientPhone);
+    if (!fullPhoneNumber || fullPhoneNumber.length !== 12) {
+      alert('Please enter a valid 10-digit phone number (e.g., 9308201445)');
+      return;
+    }
+
     setIsLoading(true);
-    setResults([{ type: 'loading', message: 'Sending 100 requests in parallel (FAST like Python!)...' }]);
+    setProgress(0);
+    setResults([]);
+
+    // Start progress simulation that will be tied to API call
+    let progressInterval;
+    const startTime = Date.now();
+    const minDuration = 2000; // Minimum 2 seconds for smooth UX
+    
+    progressInterval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progressPercent = Math.min(90, (elapsed / minDuration) * 90);
+      setProgress(progressPercent);
+    }, 100);
 
     try {
-      const data = await api.batchSendGiftCards({
+      // Start API call
+      const apiPromise = api.batchSendGiftCards({
         bearer: bearerToken,
         senderName: senderName || 'Jenski Rende',
         recipientName: recipientName || 'James Carl',
-        recipientPhone,
+        recipientPhone: fullPhoneNumber,
         message: message || 'You\'re the light in the dark. You cheer me up when I\'m down. Here are some drinks for you!',
         count: 100,
       });
+
+      // Wait for API to complete
+      const data = await apiPromise;
+
+      // Clear progress interval
+      clearInterval(progressInterval);
+      
+      // Ensure minimum duration has passed, then show 100%
+      const elapsed = Date.now() - startTime;
+      if (elapsed < minDuration) {
+        await new Promise(resolve => setTimeout(resolve, minDuration - elapsed));
+      }
+      
+      setProgress(100);
+
+      // Small delay before showing result
+      await new Promise(resolve => setTimeout(resolve, 300));
 
       // Process results
       const sortedResults = data.sort((a, b) => (a.index || 0) - (b.index || 0));
@@ -207,9 +259,12 @@ const GiftCardSender = ({ bearerToken, onBearerTokenChange, activeForm, setActiv
       // Refresh balance after sending gift cards
       fetchBalance();
     } catch (err) {
+      clearInterval(progressInterval);
+      setProgress(0);
       setResults([{ type: 'error', message: 'ERROR: ' + err.message }]);
     } finally {
       setIsLoading(false);
+      setTimeout(() => setProgress(0), 500);
     }
   };
 
@@ -226,6 +281,12 @@ const GiftCardSender = ({ bearerToken, onBearerTokenChange, activeForm, setActiv
 
   return (
     <div>
+      {isLoading && (
+        <CoffeeProgressBar 
+          progress={progress} 
+          message="Sending Gift Cards..." 
+        />
+      )}
       {/* All Buttons in One Clean Row */}
       <div className="full" style={{ 
         marginBottom: '24px',
@@ -303,6 +364,19 @@ const GiftCardSender = ({ bearerToken, onBearerTokenChange, activeForm, setActiv
                   <span style={{ color: 'var(--zus-muted)', fontSize: '11px' }}>
                     (R: ₱{balance.balance.toFixed(2)} | P: ₱{balance.promotional_balance.toFixed(2)})
                   </span>
+                  {totalRedeemed !== null && (
+                    <>
+                      <span style={{ color: 'var(--zus-muted)', marginLeft: '8px' }}>|</span>
+                      <span style={{ color: 'var(--zus-muted)', fontSize: '13px', marginLeft: '8px' }}>
+                        Total Redeemed: <span style={{ color: 'var(--zus-navy)', fontWeight: 700 }}>{totalRedeemed}</span>
+                        {totalRedeemedAmount !== null && (
+                          <span style={{ marginLeft: '6px' }}>
+                            (<span style={{ color: 'var(--zus-navy)', fontWeight: 700 }}>₱{totalRedeemedAmount.toFixed(2)}</span>)
+                          </span>
+                        )}
+                      </span>
+                    </>
+                  )}
                   <button
                     type="button"
                     onClick={(e) => {
@@ -391,9 +465,10 @@ const GiftCardSender = ({ bearerToken, onBearerTokenChange, activeForm, setActiv
         <input
           type="text"
           className="form-input"
-          placeholder="e.g., 639308201445"
+          placeholder="e.g., 9308201445 (63 will be added automatically)"
           value={recipientPhone}
-          onChange={(e) => setRecipientPhone(e.target.value)}
+          onChange={(e) => setRecipientPhone(formatPhoneInput(e.target.value))}
+          maxLength={10}
         />
       </div>
 

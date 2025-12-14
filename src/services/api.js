@@ -184,6 +184,21 @@ const api = {
     return handleResponse(response);
   },
 
+  // Get Redeemed Gift Cards Total
+  getRedeemedGiftCards: async (bearer) => {
+    const response = await fetch(`${API_BASE}/api/get-redeemed-gift-cards`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        bearer,
+      }),
+    });
+
+    return handleResponse(response);
+  },
+
   // Delete Account
   deleteAccount: async (bearer, reason = '') => {
     const response = await fetch(`${API_BASE}/api/delete-account`, {

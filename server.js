@@ -722,6 +722,90 @@ app.post('/api/get-balance', async (req, res) => {
   });
 });
 
+// Get Redeemed Gift Cards Total
+app.post('/api/get-redeemed-gift-cards', async (req, res) => {
+  const { bearer } = req.body;
+
+  if (!bearer) {
+    return res.json({ success: false, error: 'Bearer token is required' });
+  }
+
+  const session = getSession('default');
+  const headers = {
+    'authorization': `Bearer ${bearer}`,
+    'device-id': session.deviceId,
+    'Content-Type': 'application/json',
+  };
+
+  try {
+    // Fetch first page to get total pages
+    const firstPageResult = await makeRequest(
+      'https://appv2.zuscoffee.ph/api/v1/balance/gift-card/list-redeemed?page=1',
+      'GET',
+      null,
+      headers
+    );
+
+    if (firstPageResult.error) {
+      return res.json({ success: false, error: firstPageResult.error });
+    }
+
+    if (firstPageResult.status !== 200 || !firstPageResult.body?.data) {
+      return res.json({
+        success: false,
+        error: firstPageResult.body?.message || 'Unable to fetch redeemed gift cards',
+      });
+    }
+
+    const firstPageData = firstPageResult.body.data;
+    const totalCount = firstPageData.total || 0;
+    const lastPage = firstPageData.last_page || 1;
+
+    // Sum amounts from first page
+    let totalAmount = 0;
+    if (firstPageData.data && Array.isArray(firstPageData.data)) {
+      firstPageData.data.forEach((card) => {
+        totalAmount += parseFloat(card.amount || '0.00');
+      });
+    }
+
+    // Fetch remaining pages if any
+    if (lastPage > 1) {
+      const pagePromises = [];
+      for (let page = 2; page <= lastPage; page++) {
+        pagePromises.push(
+          makeRequest(
+            `https://appv2.zuscoffee.ph/api/v1/balance/gift-card/list-redeemed?page=${page}`,
+            'GET',
+            null,
+            headers
+          )
+        );
+      }
+
+      const pageResults = await Promise.all(pagePromises);
+      pageResults.forEach((pageResult) => {
+        if (pageResult.status === 200 && pageResult.body?.data?.data && Array.isArray(pageResult.body.data.data)) {
+          pageResult.body.data.data.forEach((card) => {
+            totalAmount += parseFloat(card.amount || '0.00');
+          });
+        }
+      });
+    }
+
+    return res.json({
+      success: true,
+      total: totalCount,
+      totalAmount: totalAmount.toFixed(2),
+    });
+  } catch (error) {
+    return res.json({
+      success: false,
+      error: error.message || 'Unable to fetch redeemed gift cards',
+    });
+  }
+});
+
 // Delete Account
 app.post('/api/delete-account', async (req, res) => {
   const { bearer, reason = '' } = req.body;

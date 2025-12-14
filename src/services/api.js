@@ -1,7 +1,21 @@
 // API Service for ZUS Coffee backend (Node.js/Express)
-const API_BASE = process.env.NODE_ENV === 'development'
-  ? 'http://localhost:3001' // Node.js backend server
-  : window.location.origin; // Production: same origin
+// Smart detection: Use localhost if running locally, otherwise use Render backend
+const getApiBase = () => {
+  // If in development mode, always use localhost
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:3001';
+  }
+  
+  // If running on localhost (even in production build), use localhost backend
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:3001';
+  }
+  
+  // Otherwise, use Render backend (production)
+  return 'https://zus-wla0.onrender.com';
+};
+
+const API_BASE = getApiBase();
 
 // Helper function to handle API responses
 const handleResponse = async (response) => {

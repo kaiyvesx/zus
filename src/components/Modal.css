@@ -33,7 +33,7 @@
   overflow-y: auto;
   position: relative;
   animation: slideUp 0.3s ease-out;
-  border: 3px solid var(--zus-gold);
+  border: 3px solid var(--zus-blue);
 }
 
 @keyframes slideUp {
@@ -52,17 +52,17 @@
 }
 
 .modal-content::-webkit-scrollbar-track {
-  background: rgba(212, 175, 55, 0.1);
+  background: rgba(39, 56, 128, 0.1);
   border-radius: 10px;
 }
 
 .modal-content::-webkit-scrollbar-thumb {
-  background: var(--zus-gold);
+  background: var(--zus-blue);
   border-radius: 10px;
 }
 
 .modal-content::-webkit-scrollbar-thumb:hover {
-  background: #c29d2f;
+  background: var(--zus-navy);
 }
 
 .modal-header {

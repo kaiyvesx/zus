@@ -204,7 +204,7 @@ const SignupForm = ({ bearerToken, onBearerTokenChange, onClose }) => {
       )}
 
       {step === 2 && (
-        <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '2px solid var(--zus-gold)' }}>
+        <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '2px solid var(--zus-blue)' }}>
           <div style={{ marginBottom: '12px' }}>
             <label className="form-label">Verification Code (OTP)</label>
             <input
@@ -226,7 +226,7 @@ const SignupForm = ({ bearerToken, onBearerTokenChange, onClose }) => {
       )}
 
       {step === 3 && (
-        <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '2px solid var(--zus-gold)' }}>
+        <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '2px solid var(--zus-blue)' }}>
           {isRegistering && (
             <CoffeeProgressBar 
               progress={progress} 
@@ -248,7 +248,7 @@ const SignupForm = ({ bearerToken, onBearerTokenChange, onClose }) => {
               <input
                 type="text"
                 className="form-input"
-                style={{ background: 'white', border: '2px solid var(--zus-gold)' }}
+                style={{ background: 'white', border: '2px solid var(--zus-blue)' }}
                 placeholder="e.g., Jaema"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
@@ -260,7 +260,7 @@ const SignupForm = ({ bearerToken, onBearerTokenChange, onClose }) => {
               <input
                 type="text"
                 className="form-input"
-                style={{ background: 'white', border: '2px solid var(--zus-gold)' }}
+                style={{ background: 'white', border: '2px solid var(--zus-blue)' }}
                 placeholder="e.g., Rondieq"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
@@ -289,7 +289,7 @@ const SignupForm = ({ bearerToken, onBearerTokenChange, onClose }) => {
                 type="date"
                 id="signupDOB"
                 className="form-input"
-                style={{ background: 'white', border: '2px solid var(--zus-gold)' }}
+                style={{ background: 'white', border: '2px solid var(--zus-blue)' }}
                 value={dob}
                 onChange={(e) => setDob(e.target.value)}
                 required
@@ -301,7 +301,7 @@ const SignupForm = ({ bearerToken, onBearerTokenChange, onClose }) => {
                   type="checkbox"
                   checked={dobPrivate}
                   onChange={(e) => setDobPrivate(e.target.checked)}
-                  style={{ width: '20px', height: '20px', cursor: 'pointer', accentColor: 'var(--zus-gold)' }}
+                  style={{ width: '20px', height: '20px', cursor: 'pointer', accentColor: 'var(--zus-blue)' }}
                 />
                 <span>Keep DOB private</span>
               </label>

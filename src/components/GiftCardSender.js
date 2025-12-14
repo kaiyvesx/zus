@@ -18,6 +18,7 @@ const GiftCardSender = ({ bearerToken, onBearerTokenChange, activeForm, setActiv
   const [attemptedTokens, setAttemptedTokens] = useState(new Set()); // Track tokens we've already tried
   const [balance, setBalance] = useState(null); // Current balance
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
+  const [balanceError, setBalanceError] = useState(null); // Error message for balance
   const [totalRedeemed, setTotalRedeemed] = useState(null); // Total redeemed gift cards count
   const [totalRedeemedAmount, setTotalRedeemedAmount] = useState(null); // Total redeemed gift cards amount
 
@@ -27,29 +28,51 @@ const GiftCardSender = ({ bearerToken, onBearerTokenChange, activeForm, setActiv
       setBalance(null);
       setTotalRedeemed(null);
       setTotalRedeemedAmount(null);
+      setBalanceError(null);
       return;
     }
 
     setIsLoadingBalance(true);
+    setBalanceError(null);
+    
     try {
-      const [balanceData, redeemedData] = await Promise.all([
-        api.getBalance(bearerToken),
-        api.getRedeemedGiftCards(bearerToken),
-      ]);
+      // Fetch balance and redeemed cards separately to handle partial failures
+      const balancePromise = api.getBalance(bearerToken).catch(err => {
+        console.error('Failed to fetch balance:', err);
+        return { success: false, error: err.message };
+      });
       
-      if (balanceData.success) {
+      const redeemedPromise = api.getRedeemedGiftCards(bearerToken).catch(err => {
+        console.error('Failed to fetch redeemed cards:', err);
+        return { success: false, error: err.message };
+      });
+      
+      const [balanceData, redeemedData] = await Promise.all([balancePromise, redeemedPromise]);
+      
+      if (balanceData && balanceData.success) {
         setBalance({
           balance: parseFloat(balanceData.balance || 0),
           promotional_balance: parseFloat(balanceData.promotional_balance || 0),
           total: parseFloat(balanceData.total_balance || 0),
         });
+        setBalanceError(null);
+      } else {
+        const errorMsg = balanceData?.error || 'Failed to fetch balance';
+        setBalanceError(errorMsg);
+        console.warn('Balance fetch failed:', errorMsg);
+        // Don't clear balance if it was previously set
       }
       
-      if (redeemedData.success) {
+      if (redeemedData && redeemedData.success) {
         setTotalRedeemed(redeemedData.total || 0);
         setTotalRedeemedAmount(parseFloat(redeemedData.totalAmount || 0));
+      } else {
+        // Don't clear redeemed data if it was previously set, just log
+        console.warn('Redeemed cards fetch failed:', redeemedData?.error || 'Unknown error');
       }
     } catch (err) {
+      const errorMsg = err.message || 'Failed to fetch balance';
+      setBalanceError(errorMsg);
       console.error('Failed to fetch balance or redeemed cards:', err);
     } finally {
       setIsLoadingBalance(false);
@@ -357,6 +380,32 @@ const GiftCardSender = ({ bearerToken, onBearerTokenChange, activeForm, setActiv
                   <span className="spinner" style={{ width: '10px', height: '10px', borderWidth: '1.5px' }}></span>
                   <span>Loading...</span>
                 </>
+              ) : balanceError ? (
+                <>
+                  <span style={{ color: 'var(--zus-muted)', fontSize: '12px' }}>
+                    Error: {balanceError}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      fetchBalance();
+                    }}
+                    disabled={isLoadingBalance}
+                    style={{
+                      background: 'transparent',
+                      border: '1px solid var(--zus-navy)',
+                      borderRadius: '4px',
+                      padding: '2px 8px',
+                      fontSize: '11px',
+                      color: 'var(--zus-navy)',
+                      cursor: isLoadingBalance ? 'not-allowed' : 'pointer',
+                      marginLeft: '4px'
+                    }}
+                  >
+                    Retry
+                  </button>
+                </>
               ) : balance ? (
                 <>
                   <span>Balance:</span>
@@ -386,11 +435,11 @@ const GiftCardSender = ({ bearerToken, onBearerTokenChange, activeForm, setActiv
                     disabled={isLoadingBalance}
                     style={{
                       background: 'transparent',
-                      border: '1px solid var(--zus-gold)',
+                      border: '1px solid var(--zus-navy)',
                       borderRadius: '4px',
                       padding: '2px 8px',
                       fontSize: '11px',
-                      color: 'var(--zus-gold)',
+                      color: 'var(--zus-navy)',
                       cursor: isLoadingBalance ? 'not-allowed' : 'pointer',
                       marginLeft: '4px'
                     }}
@@ -404,7 +453,7 @@ const GiftCardSender = ({ bearerToken, onBearerTokenChange, activeForm, setActiv
           {(isActivatingBalance || activateBalanceStatus) && (
             <span style={{ 
               fontSize: '12px', 
-              color: isActivatingBalance ? 'var(--zus-gold)' : (activateBalanceStatus.includes('successfully') ? 'var(--zus-gold)' : 'var(--zus-navy)'),
+              color: isActivatingBalance ? 'var(--zus-blue)' : (activateBalanceStatus.includes('successfully') ? 'var(--zus-blue)' : 'var(--zus-navy)'),
               fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
@@ -530,8 +579,8 @@ const GiftCardSender = ({ bearerToken, onBearerTokenChange, activeForm, setActiv
               }
               if (result.type === 'summary') {
                 return (
-                  <div key={index} className="result-item" style={{ background: 'rgba(212, 175, 55, 0.15)', borderLeft: '4px solid var(--zus-gold)', padding: '12px', marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <strong style={{ color: 'var(--zus-gold)', fontSize: '16px' }}>Success Count: {result.successCount}</strong>
+                  <div key={index} className="result-item" style={{ background: 'rgba(39, 56, 128, 0.1)', borderLeft: '4px solid var(--zus-blue)', padding: '12px', marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <strong style={{ color: 'var(--zus-blue)', fontSize: '16px' }}>Success Count: {result.successCount}</strong>
                     <strong style={{ color: 'var(--zus-navy)', fontSize: '16px' }}>Total Amount: ₱{result.totalAmount.toFixed(2)}</strong>
                   </div>
                 );
@@ -554,7 +603,7 @@ const GiftCardSender = ({ bearerToken, onBearerTokenChange, activeForm, setActiv
                 return (
                   <div key={index} className="result-item">
                     <span className="status-ok">SUCCESS</span> <span style={{ color: 'var(--zus-navy)', fontWeight: 800 }}>₱{result.amount}</span>
-                    <span style={{ color: 'var(--zus-gold)', fontWeight: 700 }}> Ref: {result.ref_id}</span>
+                    <span style={{ color: 'var(--zus-blue)', fontWeight: 700 }}> Ref: {result.ref_id}</span>
                     <br />
                     <small style={{ color: 'var(--zus-muted)' }}>
                       From: <strong>{htmlEscape(result.sender_name)}</strong> → To: <strong>{htmlEscape(result.recipient_name)}</strong> ({htmlEscape(result.recipient_phone)})

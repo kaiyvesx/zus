@@ -131,9 +131,9 @@ const CustomSendForm = ({ bearerToken, onClose }) => {
             className="result-item"
             style={{
               background: status.includes('successfully') || status.includes('Ref ID')
-                ? 'rgba(212, 175, 55, 0.15)'
+                ? 'rgba(39, 56, 128, 0.1)'
                 : 'rgba(26, 36, 86, 0.1)',
-              borderLeft: `4px solid ${status.includes('successfully') || status.includes('Ref ID') ? 'var(--zus-gold)' : 'var(--zus-navy)'}`,
+              borderLeft: `4px solid ${status.includes('successfully') || status.includes('Ref ID') ? 'var(--zus-blue)' : 'var(--zus-navy)'}`,
               padding: '12px',
             }}
           >
@@ -153,8 +153,8 @@ const CustomSendForm = ({ bearerToken, onClose }) => {
           <div
             className="result-item"
             style={{
-              background: 'rgba(212, 175, 55, 0.15)',
-              borderLeft: '4px solid var(--zus-gold)',
+              background: 'rgba(39, 56, 128, 0.1)',
+              borderLeft: '4px solid var(--zus-blue)',
               padding: '16px',
             }}
           >
@@ -163,7 +163,7 @@ const CustomSendForm = ({ bearerToken, onClose }) => {
               <span style={{ color: 'var(--zus-navy)', fontWeight: 800, marginLeft: '8px' }}>
                 ₱{successData.amount}
               </span>
-              <span style={{ color: 'var(--zus-gold)', fontWeight: 700, marginLeft: '8px' }}>
+              <span style={{ color: 'var(--zus-blue)', fontWeight: 700, marginLeft: '8px' }}>
                 Ref: {successData.ref_id}
               </span>
             </div>

@@ -232,13 +232,13 @@ const RedeemForm = ({ bearerToken, onClose }) => {
       </div>
 
       {showResults && results.length > 0 && (
-        <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '2px solid var(--zus-gold)', maxHeight: '300px', overflowY: 'auto' }}>
+        <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '2px solid var(--zus-blue)', maxHeight: '300px', overflowY: 'auto' }}>
           {results.map((result, index) => {
             if (result.success) {
               return (
-                <div key={index} style={{ background: 'rgba(212, 175, 55, 0.15)', padding: '12px', borderRadius: '8px', borderLeft: '4px solid var(--zus-gold)', marginBottom: '8px' }}>
+                <div key={index} style={{ background: 'rgba(39, 56, 128, 0.1)', padding: '12px', borderRadius: '8px', borderLeft: '4px solid var(--zus-blue)', marginBottom: '8px' }}>
                   <div style={{ fontWeight: 700, color: 'var(--zus-navy)', marginBottom: '4px' }}>Code: {htmlEscape(result.code)}</div>
-                  <div style={{ color: 'var(--zus-gold)', fontWeight: 600 }}>Amount: ₱{result.amount}</div>
+                  <div style={{ color: 'var(--zus-blue)', fontWeight: 600 }}>Amount: ₱{result.amount}</div>
                   <div style={{ color: 'var(--zus-navy)', fontSize: '12px' }}>Balance: ₱{result.new_promotional_balance}</div>
                 </div>
               );

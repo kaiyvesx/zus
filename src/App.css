@@ -16,7 +16,7 @@
   left: 0;
   right: 0;
   height: 6px;
-  background: linear-gradient(90deg, var(--zus-navy) 0%, var(--zus-blue) 50%, var(--zus-gold) 100%);
+  background: linear-gradient(90deg, var(--zus-navy) 0%, var(--zus-blue) 100%);
 }
 
 h1 {
@@ -75,7 +75,7 @@ h1 {
 .form-input:focus,
 .form-textarea:focus {
   background: var(--zus-white);
-  border-color: var(--zus-gold);
+  border-color: var(--zus-blue);
   box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
 }
 
@@ -122,13 +122,13 @@ h1 {
 }
 
 .button-secondary {
-  background: linear-gradient(135deg, var(--zus-gold) 0%, #c29d2f 100%);
-  color: var(--zus-navy);
-  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+  background: linear-gradient(135deg, var(--zus-blue) 0%, var(--zus-navy) 100%);
+  color: var(--zus-white);
+  box-shadow: 0 4px 15px rgba(39, 56, 128, 0.3);
 }
 
 .button-secondary:hover {
-  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+  box-shadow: 0 6px 20px rgba(39, 56, 128, 0.4);
 }
 
 .button-small {
@@ -166,17 +166,17 @@ h1 {
 }
 
 .result-box::-webkit-scrollbar-track {
-  background: rgba(212, 175, 55, 0.1);
+  background: rgba(39, 56, 128, 0.1);
   border-radius: 10px;
 }
 
 .result-box::-webkit-scrollbar-thumb {
-  background: var(--zus-gold);
+  background: var(--zus-blue);
   border-radius: 10px;
 }
 
 .result-box::-webkit-scrollbar-thumb:hover {
-  background: #c29d2f;
+  background: var(--zus-navy);
 }
 
 .result-item {
@@ -222,18 +222,18 @@ h1 {
   display: inline-block;
   padding: 8px 16px;
   border-radius: 25px;
-  background: linear-gradient(135deg, var(--zus-gold) 0%, #c29d2f 100%);
-  color: var(--zus-navy);
+  background: linear-gradient(135deg, var(--zus-blue) 0%, var(--zus-navy) 100%);
+  color: var(--zus-white);
   border: none;
   font-size: 13px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 1px;
-  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.4);
+  box-shadow: 0 2px 8px rgba(39, 56, 128, 0.4);
 }
 
 .status-ok {
-  color: var(--zus-gold);
+  color: var(--zus-blue);
   font-weight: 800;
 }
 
@@ -246,8 +246,8 @@ h1 {
   display: inline-block;
   width: 16px;
   height: 16px;
-  border: 3px solid rgba(212, 175, 55, 0.3);
-  border-top-color: var(--zus-gold);
+  border: 3px solid rgba(39, 56, 128, 0.3);
+  border-top-color: var(--zus-blue);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }

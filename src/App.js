@@ -49,7 +49,7 @@ function App() {
         </div>
         <h1>ZUS COFFEE</h1>
         <div className="sub">
-          a Necessity, not a <span style={{ color: 'var(--zus-gold)' }}>Luxury</span>
+          a Necessity, not a <span style={{ color: 'var(--zus-blue)' }}>Luxury</span>
         </div>
 
         <GiftCardSender

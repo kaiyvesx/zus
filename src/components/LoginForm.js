@@ -125,7 +125,7 @@ const LoginForm = ({ bearerToken, onBearerTokenChange, onClose }) => {
       )}
 
       {step === 2 && (
-        <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '2px solid var(--zus-gold)' }}>
+        <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '2px solid var(--zus-blue)' }}>
           {isLoading && (
             <CoffeeProgressBar 
               progress={progress} 

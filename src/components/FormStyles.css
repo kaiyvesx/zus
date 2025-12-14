@@ -1,0 +1,12 @@
+.form-container {
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.form-container h3 {
+  margin: 0 0 16px;
+  color: var(--zus-navy);
+  font-size: 18px;
+}
+

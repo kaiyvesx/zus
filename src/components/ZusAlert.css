@@ -1,0 +1,125 @@
+.zus-alert-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.zus-alert-modal {
+  background: var(--zus-white);
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  min-width: 320px;
+  max-width: 450px;
+  width: 90%;
+  overflow: hidden;
+  animation: slideUp 0.3s ease;
+  border: 3px solid var(--zus-navy);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.zus-alert-header {
+  background: linear-gradient(135deg, var(--zus-navy) 0%, var(--zus-blue) 100%);
+  padding: 20px 24px;
+  border-bottom: 2px solid var(--zus-blue);
+}
+
+.zus-alert-title {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--zus-white);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.zus-alert-body {
+  padding: 24px;
+  background: var(--zus-cream);
+}
+
+.zus-alert-message {
+  font-size: 16px;
+  color: var(--zus-navy);
+  line-height: 1.6;
+  font-weight: 500;
+  white-space: pre-line;
+}
+
+.zus-alert-footer {
+  padding: 16px 24px;
+  background: var(--zus-white);
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  border-top: 2px solid rgba(26, 36, 86, 0.1);
+}
+
+.zus-alert-button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 100px;
+}
+
+.zus-alert-button-confirm {
+  background: linear-gradient(135deg, var(--zus-navy) 0%, var(--zus-blue) 100%);
+  color: var(--zus-white);
+  box-shadow: 0 4px 12px rgba(26, 36, 86, 0.3);
+}
+
+.zus-alert-button-confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(26, 36, 86, 0.4);
+}
+
+.zus-alert-button-confirm:active {
+  transform: translateY(0);
+}
+
+.zus-alert-button-cancel {
+  background: var(--zus-cream);
+  color: var(--zus-navy);
+  border: 2px solid var(--zus-navy);
+}
+
+.zus-alert-button-cancel:hover {
+  background: rgba(26, 36, 86, 0.05);
+  transform: translateY(-2px);
+}
+
+.zus-alert-button-cancel:active {
+  transform: translateY(0);
+}
+

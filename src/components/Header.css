@@ -1,0 +1,32 @@
+.header {
+  width: 100%;
+  background: var(--zus-navy);
+  box-shadow: 0 4px 20px rgba(26, 36, 86, 0.15);
+}
+
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  background: white;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.brand {
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: var(--zus-white);
+  font-size: 24px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
